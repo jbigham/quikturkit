@@ -76,14 +76,13 @@ var activeAssignments = 0;
 //
 for(var i=0; true; i++) {
 
-  print("\n\nITERATION " + i + ":");
-  printHITs(currentHITs);
+  print("\n\nITERATION " + i + " (" + currentHITs.length + " hits):");
 
   // Fetch the number of answers provided for the least-answered item in the database.
   var curr = answersForLowest();
+
   var lowAnswer = curr[0];
   var diff = curr[1];
-  var youngestHIT = 0;
 
   // If we already have enough answers, then don't worry about creating more.
   if(lowAnswer > numAnswersDesired - steadyStateNum) {
@@ -95,6 +94,10 @@ for(var i=0; true; i++) {
   if(diff < 60*5 && lowAnswer > (numAnswersDesired -1)) {
       lowAnswer = numAnswersDesired - 1;
   }
+
+  // Track the youngest HIT.
+  var youngestHIT = 0;
+
 
   // Refresh the number of current HITs periodically unless there's
   // been activity on the phone.
@@ -115,11 +118,12 @@ for(var i=0; true; i++) {
 	  }
 
 	  // Count active assignments, delete finished HITs.
-	  if(hit.done || secs > 5*60) {
+	  if(hit.done || secs > maxTimeTillDeath) {
 	      // Remove this HIT from our list.
 	      retireHIT(currentHITs.splice(j, 1));
 	  } else {
-	      activeAssignments += hit.assignments.length;
+	      print("Adding: " + (hit.maxAssignments - hit.assignments.length));
+	      activeAssignments += (hit.maxAssignments - hit.assignments.length);
 	  }
       }
   }
